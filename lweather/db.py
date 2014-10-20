@@ -24,10 +24,15 @@ class AreaDB(object):
         """
     INSERT_AREA_SQL = "insert into area(area_code, area_name) values(?, ?)";
     
+    SELECT_AREA_SQL = "select * from area where area_code = ?";
+    
     UPDATE_AREA_SQL = "update area set weather_code = ? where area_code = ?"
     
     
     def __init__(self, db_name):
+        """
+        Create a Area DB object
+        """
         # create db to store area and weather data
         self.__create_db(db_name)
         # connec to db
@@ -58,7 +63,7 @@ class AreaDB(object):
         
         return cx, cx.cursor()
     
-    def __add(self, area_code, area_name):
+    def add(self, area_code, area_name):
         """
         add area into db
         """
@@ -66,8 +71,16 @@ class AreaDB(object):
         
         self.db_context.commit()
         
+    def get(self, area_code):
+        """
+        get a area from db
+        """
+        self.db_cursor.execute(AreaDB.SELECT_AREA_SQL, (area_code,))
         
-    def __add_many(self, areas):
+        return self.db_cursor.fetchone()
+        
+        
+    def add_many(self, areas):
         """
         add many areas at one time
         areas like:
@@ -80,12 +93,16 @@ class AreaDB(object):
         
         self.db_context.commit()
         
-    def __update(self, area_code, weather_code):
+    def update(self, area_code, weather_code):
         """
         set weather code for given area
         """
         self.db_cursor.execute(AreaDB.UPDATE_AREA_SQL, (weather_code, area_code))
         
         self.db_context.commit()
+        
+    def close(self):
+        self.db_cursor.close()
+        self.db_context.close()
         
     
