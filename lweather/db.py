@@ -8,9 +8,10 @@ Created on Oct 20, 2014
 
 import sqlite3
 
-class Area(object):
+class AreaDB(object):
     """
     Area
+    This class will do the db operations for area data like save area data/weather data into db table
     """
     DROP_AREA_TBL_SQL = """
         drop table if exists area;
@@ -22,6 +23,8 @@ class Area(object):
             weather_code varchar(10));
         """
     INSERT_AREA_SQL = "insert into area(area_code, area_name) values(?, ?)";
+    
+    UPDATE_AREA_SQL = "update area set weather_code = ? where area_code = ?"
     
     
     def __init__(self, db_name):
@@ -40,8 +43,8 @@ class Area(object):
         cx = sqlite3.connect(db_name)  # @UndefinedVariable
         cur = cx.cursor()
         
-        cur.execute(Area.DROP_AREA_TBL_SQL)        
-        cur.execute(Area.CREATE_AREA_TBL_SQL)
+        cur.execute(AreaDB.DROP_AREA_TBL_SQL)        
+        cur.execute(AreaDB.CREATE_AREA_TBL_SQL)
         
         cur.close()
         cx.close()
@@ -59,7 +62,7 @@ class Area(object):
         """
         add area into db
         """
-        self.db_cursor.execute(Area.INSERT_AREA_SQL, (area_code, area_name))
+        self.db_cursor.execute(AreaDB.INSERT_AREA_SQL, (area_code, area_name))
         
         self.db_context.commit()
         
@@ -73,9 +76,16 @@ class Area(object):
             ('02','shanghai')
         ]
         """
-        self.db_cursor.executemany(Area.INSERT_AREA_SQL,areas)
+        self.db_cursor.executemany(AreaDB.INSERT_AREA_SQL,areas)
         
         self.db_context.commit()
         
-    
+    def __update(self, area_code, weather_code):
+        """
+        set weather code for given area
+        """
+        self.db_cursor.execute(AreaDB.UPDATE_AREA_SQL, (weather_code, area_code))
+        
+        self.db_context.commit()
+        
     
